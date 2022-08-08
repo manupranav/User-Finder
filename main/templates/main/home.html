@@ -1,0 +1,14 @@
+<html>
+<head>
+</head>
+<body>
+{% if request.user.is_authenticated %}
+    <p>You are: {{ request.user }}</p>
+    <a href="{% url 'logout' %}">Logout</a>
+{% else%}
+    <a href="{% url 'login' %}">Login</a>
+{% endif %}
+<hr>
+<h1>This is UserFinder </h1>
+</body>
+</html>
