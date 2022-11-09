@@ -1,10 +1,28 @@
-<html>
-<h1>Login</h1>
-<form method="POST">
-{% csrf_token %}
+{% extends 'main/main.html' %} {% block content %} {% load tailwind_tags %}
 
-{{ form.as_p}}
-<input type="submit" value="Login">
-</form>
-<p>Don't have an account ? <a href="{% url 'register' %}">Register</a></p>
-</html>
+<div class="header-bar">
+  <h1>LOGIN</h1>
+</div>
+
+<div class="card-body">
+  <form method="POST">
+    {% csrf_token %} {{form.as_p}}
+    <input
+      style="margin-left: auto; margin-top: 10px"
+      class="button"
+      type="submit"
+      value="Login"
+    />
+  </form>
+  <br />
+  <p>
+    Don't have an account?
+    <a
+      style="letter-spacing: 2px; padding-left: 4px; font-weight: 900"
+      href="{% url 'register' %} "
+      >Register</a
+    >
+  </p>
+</div>
+
+{% endblock content %}
