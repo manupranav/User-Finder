@@ -1,0 +1,38 @@
+{% extends 'main/main.html' %} {% block content %}
+
+{% load tailwind_tags %}
+
+{% load static %}
+
+<div class="header-bar">
+  <a href="{% url 'home' %}">&#8592; Go Back</a>
+  <h1  class="hello">@{{search_test}}</h1>
+</div>
+
+
+
+<table class="table-auto" cellpadding="18">
+  <tr>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+  {% for search in searches %}
+  <tr>
+    <td>
+      <img
+        class="md-avatar"
+        src="https://www.google.com/s2/favicons?domain={{ search.url }}"
+        alt= ""
+        width="32px" height="32px" loading="lazy"
+        padding-left="20px"
+      />
+    </td>
+    
+    <td><a href="{{ search.url }}">{{search.sitename}}</a></td>
+    <td style="padding-left: 50px;">{{search.search_status}}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% endblock %}
