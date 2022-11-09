@@ -4,4 +4,4 @@ from django import forms
 
 
 class SearchForm(forms.Form):
-    name = forms.CharField()
+    name = forms.CharField(strip=False)
