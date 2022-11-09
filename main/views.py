@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 import json
 import requests
 from requests import Session
+from django.http import HttpResponse
 
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -63,7 +64,7 @@ def home(request):
     return render(request, 'main/home.html')
 
 
-class SearchList(ListView):
+class SearchList(LoginRequiredMixin, ListView):
     model = SearchTerm
     template_name = 'main/home.html'
     context_object_name = 'searches'
@@ -77,12 +78,15 @@ class SearchList(ListView):
 
 def SearchDetail(request, pk):
     search = SearchResult.objects.filter(term_id=pk)
-    context = {'searches': search}
+    # filter speifically the value and ignore everthing else
+    search_test = SearchTerm.objects.filter(
+        id=pk).values_list('name', flat=True)[0]
+    context = {'searches': search, 'search_test': search_test}
 
     return render(request, 'main/search_detail.html', context)
 
 
-class SearchCreate(CreateView):
+class SearchCreate(LoginRequiredMixin, CreateView):
     model = SearchTerm
     fields = ['name']
     success_url = reverse_lazy('search')
@@ -92,21 +96,19 @@ class SearchCreate(CreateView):
         return super(SearchCreate, self).form_valid(form)
 
 
-class SearchUpdate(UpdateView):
+class SearchUpdate(LoginRequiredMixin, UpdateView):
     model = SearchTerm
     fields = ['name']
     success_url = reverse_lazy('search')
 
 
-class SearchDelete(DeleteView):
+class SearchDelete(LoginRequiredMixin, DeleteView):
     model = SearchTerm
     context_object_name = 'search'
     success_url = reverse_lazy('search-list')
 
-# process request asynchronously
 
-
-async def get_page(session, url, urlMain, item):
+async def get_page(session, url, urlMain, item):  # process request asynchronously
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0',
         'accept-language': 'en-US,en;q=0.9',
@@ -127,8 +129,9 @@ def create_name(user_q, name_q):
 
 
 @database_sync_to_async
-def result_save(search_term, urlMain, item, status):
+def result_save(host, search_term, urlMain, item, status):
     site_data = SearchResult(
+        host=host,
         term=search_term,
         url=urlMain,
         sitename=item,
@@ -141,13 +144,14 @@ async def create_search(request):
     form = SearchForm()
     if request.method == 'POST':
         name = request.POST['name']
+        # convert space to '_' to compatible with some websites.
+        name = name.replace(' ', '_')
 
         with open('sites-data.json') as f:
             data = json.load(f)
             mod_data = json.loads(json.dumps(data).replace("{}", name))
 
             term_name = await create_name(request.user, name)
-            print(term_name)
 
             tasks = []
             async with aiohttp.ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
@@ -161,11 +165,15 @@ async def create_search(request):
                 try:
                     for url, st_code, urlMain, item in results:
                         if st_code == 200:
-                            await result_save(term_name, urlMain, item, 'CLAIMED')
+                            await result_save(request.user, term_name, urlMain, item, 'CLAIMED')
                         else:
-                            await result_save(term_name, urlMain, item, 'AVAILABLE')
+                            await result_save(request.user, term_name, urlMain, item, 'AVAILABLE')
+
                 except Exception as e:
                     print(e)
+            # store the id and redirect to the search result
+            pk = term_name.id
+            return redirect("search-detail", pk)
 
     context = {'form': form}
     return render(request, 'main/search.html', context)
