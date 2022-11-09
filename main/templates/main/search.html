@@ -1,0 +1,18 @@
+{% extends 'main/main.html' %} {% block content %}
+
+<div class="header-bar">
+  <a href="{% url 'home' %}">&#8592; Back</a>
+</div>
+<div class="card-body">
+  <form method="POST" action="">
+    {% csrf_token %} {{form.as_p}}
+
+    <input
+      style="margin-top: 10px; margin-left: auto"
+      class="button"
+      type="submit"
+      value="Submit"
+    />
+  </form>
+</div>
+{% endblock %}
