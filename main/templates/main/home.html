@@ -1,14 +1,79 @@
-<html>
-<head>
-</head>
-<body>
-{% if request.user.is_authenticated %}
-    <p>You are: {{ request.user }}</p>
-    <a href="{% url 'logout' %}">Logout</a>
-{% else%}
-    <a href="{% url 'login' %}">Login</a>
-{% endif %}
-<hr>
-<h1>This is UserFinder </h1>
-</body>
-</html>
+{% extends 'main/main.html' %} {% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<div class="header-bar">
+  <div>
+    <h1>Hello {{ request.user|title }}!</h1>
+  </div>
+  {% if request.user.is_authenticated %}
+  <a href="{% url 'logout' %}">Logout</a>
+  {% else%}
+  <a href="{% url 'login' %}">Login</a>
+  {% endif %}
+</div>
+
+
+<div id="search-add-wrapper">
+  <form id="form" method="POST" onsubmit="return validateForm()" style="margin-top: 20px; display: flex" action="{% url 'search-create' %}">
+    {% csrf_token %} {{ form.as_p }}
+    <input
+      id = "name"
+      type="text"
+      name="name"
+      placeholder="Search your username"
+      value="{{search_input}}"
+      maxlength="15"
+      minlength="1"
+    />
+    <button  style='margin-right:16px' type="submit" class="button" onclick="this.classList.toggle('button--loading')">
+      <span class="button__text">Search</span>
+  </button>
+  </form>
+  <!-- <a id="add-link" href="{% url 'search-create' %}">&#x2b;</a> -->
+</div>
+
+<div id="tasklist" class="task-items-wrapper">
+  {% for search in searches %}
+
+  <div class="task-wrapper">
+    <div class="task-title">
+          <b><a href="{% url 'search-detail' search.id %}">@{{ search.name }}</a><b/>
+    </div>
+    <div class="task-controls">
+      <a class="delete-link" href="{% url 'search-delete' search.id %}"
+        >&#215;</a
+      >
+      
+    </div>
+  </div>
+
+  {% empty %}
+
+  <div style="text-align: center; padding-bottom: 10px; line-height: 1em">
+    <h3>No recent searches performed.</h3>
+    <h3>
+      Create a
+      <a
+        style="text-decoration: none; color: #e53935"
+        href="{% url 'search-create' %}"
+        >New Search</a
+      >
+      !
+    </h3>
+  </div>
+
+  {% endfor %}
+</div>
+<script>
+
+function validateForm() {
+  var x = document.forms["form"]["name"].value;
+  if (x == "" || x == null) {
+    alert("Name must be filled out");
+    return false;
+  }
+}
+
+</script>
+
+{% endblock %}
