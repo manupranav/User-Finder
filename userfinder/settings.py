@@ -143,3 +143,7 @@ INTERNAL_IPS = [
 ]
 
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+
+# CORS
+
+CSRF_TRUSTED_ORIGINS = ['https://userfinder.up.railway.app']
