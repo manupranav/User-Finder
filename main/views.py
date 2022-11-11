@@ -28,9 +28,6 @@ import aiohttp
 import asyncio
 from aiohttp import TCPConnector
 
-asyncio.set_event_loop_policy(
-    asyncio.WindowsSelectorEventLoopPolicy())  # work around for windows
-
 
 class CustomLoginView(LoginView):
     template_name = 'main/login.html'
