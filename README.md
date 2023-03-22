@@ -51,7 +51,7 @@
 # Overview
 
 [![User-Finder Preview][product-preview]](https://github.com/manupranav/User-Finder/blob/master/media/preview.png)
-[![User-Finder Demo][product-video]](https://github.com/manupranav/User-Finder/blob/master/media/demo.webm)
+[![User-Finder Demo][product-video]](https://github.com/manupranav/User-Finder/blob/master/media/demo.gif)
 
 ## Built With
 
